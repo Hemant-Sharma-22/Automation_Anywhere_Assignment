@@ -158,8 +158,8 @@ AA_BASE_URL=https://community.cloud.automationanywhere.digital
 
 - **Run Individual Use Cases**:
   ```bash
-  npm run test:message-box       # Use Case 1
-  npm run test:learning-instance  # Use Case 2
+  npm run test:usecase1     # Use Case 1
+  npm run test:usecase2     # learning-instance  
   ```
 
 - **Open Playwright Interactive HTML Report**:
