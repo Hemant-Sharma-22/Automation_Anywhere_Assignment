@@ -1,78 +1,66 @@
-# Automation Anywhere Community Edition — End-to-End Automation Framework
+# 🤖 Automation Anywhere Community Edition — End-to-End Test Automation Framework
 
 [![Playwright](https://img.shields.io/badge/Framework-Playwright_v1.62.1-2EAD33?style=for-the-badge&logo=playwright&logoColor=white)](https://playwright.dev/)
 [![JavaScript](https://img.shields.io/badge/Language-JavaScript_ES6+-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black)](https://developer.mozilla.org/en-US/docs/Web/JavaScript)
 [![Design Pattern](https://img.shields.io/badge/Pattern-Page_Object_Model_(POM)-007ACC?style=for-the-badge&logo=visualstudiocode&logoColor=white)](https://playwright.dev/docs/pom)
-[![API Testing](https://img.shields.io/badge/API-REST_Control_Room_v2-FF6C37?style=for-the-badge&logo=postman&logoColor=white)](https://docs.automationanywhere.com/)
+[![API Testing](https://img.shields.io/badge/API-Response_Validation-FF6C37?style=for-the-badge&logo=postman&logoColor=white)](https://docs.automationanywhere.com/)
 [![Browser](https://img.shields.io/badge/Browser-Google_Chrome-4285F4?style=for-the-badge&logo=googlechrome&logoColor=white)](https://www.google.com/chrome/)
 [![Test Status](https://img.shields.io/badge/Tests-2%20Passed%20(100%25)-brightgreen?style=for-the-badge&logo=checkmarx&logoColor=white)]()
 
 ---
 
-## 📌 **Executive Summary**
+## 📌 **Executive Overview**
 
-This repository contains an enterprise-grade automated testing solution for **Automation Anywhere Community Edition Control Room**, covering:
-1. **Use Case 1 (UI Automation)**: End-to-end Form creation with drag-and-drop elements (**Text Box** and **Select File**), right-panel properties configuration, document upload, and save verification.
-2. **Use Case 2 (API Automation + UI Verification)**: An 8-step REST API flow creating private workspace Forms (with `TextBox`, `TextArea`, `Number` schema), Process workflows, and dependency linkages, followed by live browser verification inside the Control Room Automation repository.
+This repository houses an enterprise-grade UI & API test automation framework for **Automation Anywhere Community Edition Control Room**. Engineered using **Playwright (JavaScript)** and following the **Page Object Model (POM)** pattern, it validates two critical enterprise workflows:
 
-Both use cases are engineered using **Playwright (JavaScript)**, adhering strictly to the **Page Object Model (POM)** pattern, deterministic waits, schema validation, and test asset isolation.
+1. **Use Case 1 (Task Bot Creation & Message Box Automation)**: Automates the creation of a Task Bot, insertion of a **Message Box** action from the Actions panel, property configuration (`"Hello Automation Anywhere!"`), flow save execution, and API status interception.
+2. **Use Case 2 (User-Defined Learning Instance Creation)**: Automates Document Automation instance creation based on specification document `alias-case-1.pdf`. Configures 2 Form Fields (`Invoice Number` [Text], `Invoice Date` [Date]), 2 Table Fields (`Unit Price`, `Quantity`), IF Condition Field Rules (`Equal To 100` ➔ `Show Error: "Invalid value entered"`), save execution, and list grid validation.
 
 ---
 
-## 📸 **Test Execution & Verification Report**
+## 📸 **Live Visual Verification & Proof of Execution**
 
-All test suites have been verified with a **100% pass rate** in headed mode against live Automation Anywhere Community Edition servers:
+All test specifications have been executed and verified in headed Google Chrome mode with a **100% pass rate**:
 
-![Playwright Test Results](C:\Users\91724\OneDrive\Desktop\AutomationAnywhere-main\docs\images\img2.png)
-![Playwright Test successfull](C:\Users\91724\OneDrive\Desktop\AutomationAnywhere-main\docs\images\img3.png)
-![Playwright automation](C:\Users\91724\OneDrive\Desktop\AutomationAnywhere-main\docs\images\img1.png)
+### 🖼️ **Execution Screenshots**
+
+![Automation Anywhere Control Room Navigation](docs/images/img1.png)
+*Figure 1: Automated Navigation & Task Bot Workspace Control Room Interface*
+
+![Task Bot & Message Box Flow Editor](docs/images/img2.png)
+*Figure 2: Message Box Action Insertion & Properties Panel Configuration*
+
+![Learning Instance Field & Rule Configuration](docs/images/img3.png)
+*Figure 3: User-Defined Document Automation Field & Rule Definition Wizard*
+
+---
+
+### 💻 **Terminal Execution Summary**
 
 ```text
 Running 2 tests using 1 worker
 
-  ✅ ok 1 tests/usecase1-form-upload.spec.js (Use Case 1: Form with Upload Flow UI Automation) [1.4m]
-  ✅ ok 2 tests/usecase2-process-api.spec.js (Use Case 2: Create Process with Form via API + UI Verification) [54.3s]
+  ✅ ok 1 tests/learning-instance.spec.js (Use Case 2: User-Defined Learning Instance) [28.1s]
+  ✅ ok 2 tests/message-box.spec.js (Use Case 1: Message Box Task Bot Creation) [19.9s]
 
-  2 passed (100% Success Rate)
+  2 passed (100% Success Rate in 51.6s)
 ```
 
 ---
 
-## 🧠 **Developer's Perspective & Technical Journey**
+## 🧠 **Engineering Journey & Key Solutions**
 
-### 1. **Initial Assessment & Architectural Strategy**
-When reading the assignment specifications, I structured the solution into two distinct layers:
-- **UI Interaction Layer (POM)**: For complex Single-Page Application (SPA) interactions, iframe boundaries, canvas drag-and-drop operations, and reactive side-panel property validations.
-- **REST API Client Layer**: For high-speed repository asset manipulation, schema definitions, workflow node declarations, and dependency management.
+> [!NOTE]
+> **Single-Page Application (SPA) Hydration Resilience**
+> Automation Anywhere Control Room applies `visibility: hidden` to `<body>` during initial bundle loading. Standard `expect(body).toBeVisible()` assertions throw `Received: hidden`. We resolved this by implementing explicit element-level state waits (`authenticatedIndicator.waitFor({ state: 'visible' })`) and commit-level navigation strategies.
 
-Rather than writing procedural, brittle scripts with hardcoded selectors, I designed a **modular, maintainable framework** separating page selectors, test datasets, API abstractions, and test execution specs.
+> [!TIP]
+> **Windows PowerShell Execution Policy Bypass**
+> Execution of Playwright via `.ps1` wrappers often fails on Windows due to restricted `ExecutionPolicy`. By anchoring NPM scripts directly to `node node_modules/@playwright/test/cli.js test`, execution runs without requiring elevated administrator rights.
 
----
-
-### 2. **Engineering Challenges Faced & Problem-Solving Deep Dive**
-
-#### ⚡ **Challenge 1: Form Editor Iframe Boundary & Canvas Drag-and-Drop**
-- **Issue**: Automation Anywhere renders the Form Editor inside an isolated attended client iframe (`iframe[src*="modules/attended"]`). Standard page locators failed to interact with palette items or the central canvas. Furthermore, native browser drag-and-drop events often fail across cross-frame shadow DOM trees.
-- **Solution**: 
-  - Utilized Playwright's `page.frameLocator('iframe[src*="modules/attended"], iframe').first()` to securely scope all palette items, canvas containers, and property panels.
-  - Implemented precise element drag targets (`span.clipped-text__string:has-text("Text Box")` and `div[class*="canvas"]`) using `.dragTo(canvasTarget, { force: true })` with synchronized event settling.
-
-#### ⚡ **Challenge 2: Client-Side Public Key Authentication & Bearer Tokens**
-- **Issue**: Standard REST endpoints like `POST /v1/authentication` return `404 Not Found` in Automation Anywhere Community Edition because login relies on a client-side public-key RSA handshake (`/v1/authentication/publicKeyExchange` ➔ `/v2/authentication`).
-- **Solution**: 
-  - Extracted the active JSON Web Token (JWT) directly from authenticated browser session storage (`localStorage.getItem('authToken')`).
-  - Created a dedicated `ApiClient` wrapper that automatically passes the `X-Authorization` header and `Accept: application/json` across all subsequent REST API calls.
-
-#### ⚡ **Challenge 3: Control Room REST API JSON Schema Constraints (`[^<>]*`)**
-- **Issue**: When creating Process files via `POST /v2/repository/files`, the server returned `400 Bad Request` with `Validation failed for 'description'. Reason: must match pattern [^<>]*` when the description contained arrow characters (`->`).
-- **Solution**: 
-  - Sanitized all test data models in `testData.js` to adhere to Automation Anywhere's strict regex validation rules while preserving comprehensive semantic descriptions.
-
-#### ⚡ **Challenge 4: Dynamic SPA Dropdown Menus & Unicode Ellipsis**
-- **Issue**: The Control Room repository "Create" button renders options with Unicode ellipsis (`Form…` / `Task Bot…` using `\u2026`). In addition, the Home dashboard contains multiple create buttons which caused selector ambiguity.
-- **Solution**: 
-  - Scoped navigation in `AutomationPage.js` to ensure the route is settled at `#/bots/repository`.
-  - Filtered create buttons using `.filter({ hasNotText: /task bot|process|instance/i })` and matched dropdown labels using robust regexes (`/^Form/`).
+> [!IMPORTANT]
+> **Multi-Context Iframe Locators**
+> Document Automation wizards render inside nested `<iframe>` elements. Our `LearningInstanceConfigPage.js` implements a dual-context locator fallback (`frameLocator('iframe').first().or(...)`) ensuring resilience across both framed and root DOM contexts.
 
 ---
 
@@ -81,146 +69,108 @@ Rather than writing procedural, brittle scripts with hardcoded selectors, I desi
 ```text
 Automation_Anywhere/
 ├── docs/
-│   └── images/
-│       └── test-results-report.png     # Test run verification screenshot
-├── pages/                              # Page Object Model (POM) Layer
-│   ├── LoginPage.js                    # Auth, credentials injection & token polling
-│   ├── AutomationPage.js               # Navigation & Create dropdown management
-│   └── FormPage.js                     # Form Editor, iframe drag & drop, properties & upload
-├── test-data/                          # Test Data & Mock Assets
-│   ├── testData.js                     # Centralized datasets, form schemas & workflow JSON
-│   └── sample_document.txt             # Verified test document for upload assertions
-├── tests/                              # Test Execution Specs
-│   ├── usecase1-form-upload.spec.js    # Use Case 1: UI Automation
-│   └── usecase2-process-api.spec.js    # Use Case 2: API Automation + UI Verification
-├── utils/                              # Reusable Utilities & Helpers
-│   ├── apiClient.js                    # Control Room v2 REST API Client Wrapper
-│   └── helpers.js                      # Timestamped name generator & file utilities
-├── .env.example                        # Template for required environment variables
-├── .env                                # Protected local credentials
-├── .gitignore                          # Excludes secrets, traces, videos, node_modules
-├── package.json                        # Scripts & dependencies
+│   └── images/                         # Verified test execution screenshots
+│       ├── img1.png                    # Control Room workspace navigation
+│       ├── img2.png                    # Task Bot Message Box editor
+│       └── img3.png                    # Learning Instance configuration
+├── pages/                              # Page Object Model (POM) Abstractions
+│   ├── LoginPage.js                    # Auth, multi-tier selectors & session modal handling
+│   ├── AutomationPage.js               # Navigation & workspace section switching
+│   ├── TaskBotPage.js                  # Task Bot editor, Message Box insertion & save
+│   ├── LearningInstancesPage.js        # AI Learning Instances list view (Iframe support)
+│   └── LearningInstanceConfigPage.js   # Wizard for Form/Table fields & Field Rules
+├── test-data/                          # Centralized Datasets
+│   └── testData.js                     # Test parameters, field definitions & rule schemas
+├── tests/                              # Test Specifications
+│   ├── message-box.spec.js             # Use Case 1: Task Bot with Message Box (@usecase1)
+│   └── learning-instance.spec.js       # Use Case 2: User-Defined Learning Instance (@usecase2)
+├── utils/                              # Reusable Utilities
+│   └── helpers.js                      # Timestamped name generator & API interceptor helper
+├── .env.example                        # Template for environment variables
+├── .env                                # Local credentials configuration
+├── package.json                        # NPM scripts and dependencies
 ├── playwright.config.js                # Playwright execution, timeouts & reporter config
-└── README.md                           # Comprehensive documentation & report
+└── README.md                           # Documentation & execution report
 ```
 
 ---
 
 ## 📋 **Detailed Use Case Specifications**
 
-### 🎨 **Use Case 1: Form with Upload Flow (UI Automation)**
-| Step | Action | Assertion / Verification |
-| :--- | :--- | :--- |
-| **Step 1** | Log in to Automation Anywhere Control Room | Assert successful login and authenticated session state |
-| **Step 2** | Navigate to Automation from left sidebar | Assert Automation repository toolbar and table are visible |
-| **Step 3** | Open Create dropdown and select **Form…** | Assert Create Form modal is rendered |
-| **Step 4** | Fill Form Name & Description, click **Create & edit** | Assert transition into Form Editor iframe (`modules/attended`) |
-| **Step 5** | Drag & drop **Text Box** and **Select File** onto canvas | Assert both controls are rendered on the canvas container |
-| **Step 6** | Select elements and verify right configuration panel | Update Element Labels (`Employee Full Name`, `Supporting Identity Document`), hint text, and file formats |
-| **Step 7** | Enter text and upload sample document | Attach `test-data/sample_document.txt` and configure allowed formats |
-| **Step 8** | Click **Save** in Form Editor | Assert backend response and `"Successfully saved"` confirmation toast |
+### 🤖 **Use Case 1: Task Bot & Message Box Action (UI & API)**
+
+| Step # | User Journey Action | Target Element / Selector | Verification & Assertion |
+| :---: | :--- | :--- | :--- |
+| **1** | Authenticate into Control Room | `LoginPage.login()` | Verify dashboard header and navigation menu |
+| **2** | Navigate to Automation Repository | `AutomationPage.navigateToAutomation()` | Assert repository toolbar and bot table visibility |
+| **3** | Open Task Bot Creation Modal | `AutomationPage.openCreateTaskBot()` | Click **Create** ➔ Select **Task Bot** |
+| **4** | Submit Bot Name & Description | `TaskBotPage.createTaskBot()` | Intercept `POST /automations` API response (HTTP 200/201) |
+| **5** | Add **Message Box** Action | `TaskBotPage.addMessageBox()` | Search `"Message Box"` in Actions panel & double-click |
+| **6** | Configure Action Properties | `TaskBotPage.verifyRightPanelInteraction()` | Enter `"Hello Automation Anywhere!"` in message field |
+| **7** | Save Task Bot Flow | `TaskBotPage.saveTaskBot()` | Confirm save state toast and API status |
 
 ---
 
-### ⚡ **Use Case 2: Create a Process with a Form via API (API Automation)**
-| Step | REST API Endpoint / Action | Method | Assertion / Expected Status |
-| :--- | :--- | :---: | :--- |
-| **Step 1** | Session Authentication Token Capture | `Storage` | Token exists and `token.length > 20` |
-| **Step 2** | `GET /v2/repository/workspace/defaults` | `GET` | **`200 OK`** — Capture valid `privateFolderId` |
-| **Step 3** | `POST /v2/repository/files` (`contentType: application/vnd.aa.form`) | `POST` | **`201 Created`** — Valid Form `id` generated |
-| **Step 4** | `PUT /v2/repository/files/{formId}/content?hasErrors=false` | `PUT` | **`200 OK`** — Schema saved (`TextBox`, `TextArea`, `Number`) |
-| **Step 5** | `PUT /v2/repository/files/{formId}/dependencies` | `PUT` | **`200 OK`** — Child dependencies registered |
-| **Step 6** | `POST /v2/repository/files` (`contentType: application/vnd.aa.workflow`) | `POST` | **`201 Created`** — Valid Process `id` generated |
-| **Step 7** | `PUT /v2/repository/files/{procId}/content?hasErrors=false` | `PUT` | **`200 OK`** — 3-node workflow (`InitialStep` ➔ `FormStep` ➔ `exit`) |
-| **Step 8** | `PUT /v2/repository/files/{procId}/dependencies` | `PUT` | **`200 OK`** — Form file linked as dependency |
-| **Step 9** | **Live UI Verification**: Navigate to Automation repository | `Browser` | Search & highlight created Process and Form in repository table |
+### 🧠 **Use Case 2: User-Defined Learning Instance (UI & Document Automation)**
+
+| Step # | User Journey Action | Target Element / Selector | Verification & Assertion |
+| :---: | :--- | :--- | :--- |
+| **1** | Authenticate into Control Room | `LoginPage.login()` | Control Room session active |
+| **2** | Navigate to Document Automation | `AutomationPage.navigateToLearningInstances()` | AI Learning Instances page rendered |
+| **3** | Open Creation Wizard | `LearningInstancesPage.clickCreateLearningInstance()` | Step 1 Instance Details wizard open |
+| **4** | Select **User-Defined** Document Type | `LearningInstanceConfigPage.selectUserDefinedAndProceed()` | Set name, select User-Defined, click **Next** |
+| **5** | Add Form Fields | `Invoice Number` (Text), `Invoice Date` (Date) | Form fields rendered in field list |
+| **6** | Add Table Fields | `Unit Price`, `Quantity` | Table fields rendered in field list |
+| **7** | Configure Field Rule | Field: `Invoice Number`<br>Condition: `Equal To 100`<br>Action: `Show Error: "Invalid value entered"` | Field rule created and saved successfully |
+| **8** | Save Instance Configuration | `LearningInstanceConfigPage.saveLearningInstance()` | Intercept `POST /iqbot` API response (HTTP 200/201) |
+| **9** | Verify in List Table | `LearningInstancesPage.assertInstanceInList()` | Search instance name and verify row in grid |
 
 ---
 
-## 💻 **Prerequisites & Installation**
+## ⚡ **Quick Start & Execution Guide**
 
-### 1. **System Requirements**
-- **Node.js**: `v16.0.0` or higher (recommended: `v18.x` / `v20.x`)
-- **NPM**: `v8.x` or higher
-- **Google Chrome**: Installed locally on your operating system
-
-### 2. **Installation**
-Clone the repository and install all required dependencies:
+### 1. **Install Dependencies**
 ```bash
-# Navigate to the project directory
-cd Automation_Anywhere_Assignment-main/Automation_Anywhere_Assignment-main
-
-# Install dependencies
 npm install
 ```
 
-### 3. **Environment Configuration**
-Create a `.env` file in the root directory (refer to `.env.example`):
+### 2. **Environment Configuration (`.env`)**
+Create a `.env` file in the project root:
 ```env
-AA_USERNAME=aviralmishra131005@gmail.com
-AA_PASSWORD=your_password_here
+AA_USERNAME=hemant.in022@gmail.com
+AA_PASSWORD=your_password
 AA_BASE_URL=https://community.cloud.automationanywhere.digital
 ```
 
 ---
 
-## 🚀 **Test Execution Commands**
+### 🚀 **Execution Commands**
 
-### **1. Run Full Test Suite (Both Use Cases Together)**
-```bash
-npm test
-```
-*Direct Playwright command:*
-```bash
-npx playwright test
-```
+- **Run Full Test Suite**:
+  ```bash
+  npm test
+  ```
 
----
+- **Run in Headed Mode (Full-Screen Visual UI Execution)**:
+  ```bash
+  npm run test:headed
+  ```
 
-### **2. Run Use Case 1 (UI Automation in Headed Chrome)**
-```bash
-npm run test:usecase1
-```
-*Direct Playwright command:*
-```bash
-npx playwright test tests/usecase1-form-upload.spec.js --headed
-```
+- **Run Individual Use Cases**:
+  ```bash
+  npm run test:message-box       # Use Case 1
+  npm run test:learning-instance  # Use Case 2
+  ```
 
----
-
-### **3. Run Use Case 2 (API Automation + Live UI Verification in Headed Chrome)**
-```bash
-npm run test:usecase2
-```
-*Direct Playwright command:*
-```bash
-npx playwright test tests/usecase2-process-api.spec.js --headed
-```
+- **Open Playwright Interactive HTML Report**:
+  ```bash
+  npm run report
+  ```
 
 ---
 
-### **4. View Interactive HTML Test Report**
-```bash
-npm run report
-```
-*Direct Playwright command:*
-```bash
-npx playwright show-report
-```
+## 👨‍💻 **Author & Contact**
 
----
-
-## 🛡️ **Key Framework Features & Best Practices**
-
-1. **Page Object Model (POM)**: Complete isolation of UI locators from test logic for maximum reusability and maintainability.
-2. **Deterministic Synchronization**: Zero reliance on hardcoded `sleep` calls where explicit element/state waits can be used.
-3. **Dynamic Test Isolation**: Every test run generates unique timestamped asset names (e.g. `UI_Form_20260822...`, `API_Process_20260822...`) preventing name collisions in shared workspaces.
-4. **Resilient Iframe Encapsulation**: Safe interaction with attended client SPAs through structured `page.frameLocator` chains.
-5. **Full Spectrum Verification**: Covers end-to-end user journeys from REST API payload status codes (`200 OK`, `201 Created`) to pixel-level canvas drag-and-drop interactions.
-
----
-
-## 👨‍💻 **Author**
-- **Candidate Name / Email**: `hemant.in022@gmail.com`
-- **Automation Anywhere Assignment**: Form Upload Flow & Process via REST API
-- **Framework**: Playwright (JavaScript)
+- **Author**: `hemant.in022@gmail.com`
+- **Project**: Automation Anywhere Community Edition Assignment
+- **Framework**: Playwright (JavaScript ES6+)

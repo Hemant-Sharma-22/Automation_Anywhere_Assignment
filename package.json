@@ -1,0 +1,26 @@
+{
+  "name": "automation-anywhere-playwright",
+  "version": "1.0.0",
+  "description": "Automation Anywhere Community Edition Playwright POM & API Framework",
+  "main": "index.js",
+  "scripts": {
+    "test": "playwright test",
+    "test:headed": "playwright test --headed",
+    "test:usecase1": "playwright test tests/usecase1-form-upload.spec.js --headed",
+    "test:usecase2": "playwright test tests/usecase2-process-api.spec.js --headed",
+    "report": "playwright show-report"
+  },
+  "keywords": [
+    "playwright",
+    "automation-anywhere",
+    "pom",
+    "chrome",
+    "api-automation"
+  ],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@playwright/test": "^1.62.1",
+    "dotenv": "^16.6.1"
+  }
+}
